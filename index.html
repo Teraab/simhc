@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIM Database Lookup - Pakistan</title>
+    <title>SIM Database Lookup</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,40 +15,16 @@
             align-items: center;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 600px;
-            width: 100%;
-        }
-        
+        .container { max-width: 600px; width: 100%; }
         .card {
             background: white;
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2em;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 0.9em;
-        }
-        
-        label {
-            display: block;
-            color: #555;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
+        h1 { color: #333; text-align: center; margin-bottom: 10px; font-size: 2em; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.9em; }
+        label { display: block; color: #555; margin-bottom: 8px; font-weight: 600; }
         input {
             width: 100%;
             padding: 15px;
@@ -62,12 +33,7 @@
             font-size: 16px;
             margin-bottom: 15px;
         }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
+        input:focus { outline: none; border-color: #667eea; }
         .btn {
             width: 100%;
             padding: 15px;
@@ -80,11 +46,7 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
+        .btn:hover { transform: translateY(-2px); }
         .quick-btn {
             padding: 8px 12px;
             background: #f0f0f0;
@@ -94,19 +56,8 @@
             cursor: pointer;
             font-size: 0.85em;
         }
-        
-        .quick-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        
+        .quick-btn:hover { background: #667eea; color: white; }
+        .loading { display: none; text-align: center; padding: 20px; color: #666; }
         .result {
             background: #f8f9fa;
             padding: 20px;
@@ -114,14 +65,7 @@
             margin-top: 15px;
             border-left: 5px solid #667eea;
         }
-        
-        .info {
-            margin: 10px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-        }
-        
+        .info { margin: 10px 0; padding: 10px; background: white; border-radius: 5px; }
         .error {
             display: none;
             background: #fee;
@@ -138,28 +82,21 @@
         <div class="card">
             <h1>🔍 SIM Database Lookup</h1>
             <p class="subtitle">Pakistan's Premier SIM Information System</p>
-            
             <label>Enter Phone Number or CNIC</label>
-            <input type="text" id="sim" placeholder="e.g., 3096969416 or 3540118386247" maxlength="13">
-            
+            <input type="text" id="sim" placeholder="e.g., 3096969416" maxlength="13">
             <div style="margin-bottom:15px">
                 <button class="quick-btn" onclick="fill('3338570120')">3338570120</button>
                 <button class="quick-btn" onclick="fill('3321756120')">3321756120</button>
                 <button class="quick-btn" onclick="fill('3096969416')">3096969416</button>
             </div>
-            
             <button class="btn" onclick="search()">🔎 Search Database</button>
-            
-            <div class="loading" id="load">⏳ Searching database...</div>
+            <div class="loading" id="load">⏳ Searching...</div>
             <div class="error" id="err"></div>
             <div id="res"></div>
         </div>
     </div>
-    
     <script>
-        function fill(n) {
-            document.getElementById('sim').value = n;
-        }
+        function fill(n) { document.getElementById('sim').value = n; }
         
         async function search() {
             const s = document.getElementById('sim').value.trim();
@@ -171,7 +108,7 @@
             r.innerHTML = '';
             
             if (!s || s.length < 10) {
-                e.textContent = '⚠️ Please enter a valid phone number or CNIC';
+                e.textContent = '⚠️ Please enter valid number';
                 e.style.display = 'block';
                 return;
             }
@@ -179,17 +116,22 @@
             l.style.display = 'block';
             
             try {
-                const res = await fetch('https://famofc.site/app/simdatabase/', {
+                // Using CORS proxy
+                const formData = new URLSearchParams();
+                formData.append('sim_number', s);
+                
+                const res = await fetch('https://api.allorigins.win/raw?url=' + 
+                    encodeURIComponent('https://famofc.site/app/simdatabase/'), {
                     method: 'POST',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: 'sim_number=' + encodeURIComponent(s)
+                    body: formData
                 });
                 
                 const data = await res.json();
                 l.style.display = 'none';
                 
                 if (data.error || !data.data || !data.data.records || !data.data.records.length) {
-                    e.textContent = '❌ No records found for this number';
+                    e.textContent = '❌ No records found';
                     e.style.display = 'block';
                     return;
                 }
@@ -197,7 +139,7 @@
                 data.data.records.forEach((rec, i) => {
                     r.innerHTML += '<div class="result">' +
                         '<h3>📋 Record ' + (i+1) + '</h3>' +
-                        '<div class="info"><b>👤 Full Name:</b> ' + (rec.full_name || 'N/A') + '</div>' +
+                        '<div class="info"><b>👤 Name:</b> ' + (rec.full_name || 'N/A') + '</div>' +
                         '<div class="info"><b>📱 Phone:</b> ' + (rec.phone || 'N/A') + '</div>' +
                         '<div class="info"><b>🆔 CNIC:</b> ' + (rec.cnic || 'N/A') + '</div>' +
                         '<div class="info"><b>📍 Address:</b> ' + (rec.address || 'N/A') + '</div>' +
@@ -206,7 +148,7 @@
                 
             } catch (err) {
                 l.style.display = 'none';
-                e.textContent = '❌ Network error. Please try again.';
+                e.textContent = '❌ Network error: ' + err.message;
                 e.style.display = 'block';
             }
         }
